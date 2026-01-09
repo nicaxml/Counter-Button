@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Realtime Line Output Monitoring — Superadmin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+   <script defer src="/admin.js?v=33"></script>
+</head>
+<body>
+  <header style="position: relative; justify-content: space-between;">
+    <h1>Realtime Line Output Monitoring</h1>
+    <div id="adminClock" class="datetime" style="position: absolute; left: 50%; transform: translateX(-50%); white-space: nowrap;"></div>
+    <nav></nav>
+  </header>
+  
+  <div class="layout">
+    <aside class="sidebar">
+      <h2>Menu</h2>
+      <ul>
+        <li id="nav-admindash"><a href="#admindash" class="active">Monitoring Produksi</a></li>
+        <li id="nav-users"><a href="#users">Daftar User</a></li>
+        <li id="nav-line"><a href="#line">Daftar Line</a></li>
+        <li id="nav-mesin"><a href="#mesin">Daftar Mesin</a></li>
+        <li id="nav-devices"><a href="#devices">Device Management</a></li>
+        <li id="nav-style"><a href="#style">Master Style</a></li>
+        <li id="nav-proses"><a href="#proses">Process Breakdown</a></li>
+        <li id="nav-order"><a href="#order">Operation Breakdown</a></li>
+        <li id="nav-summary"><a href="#summary">Laporan Produksi</a></li>
+        <li id="nav-logout"><a href="#" id="btnLogout">Logout</a></li>
+      </ul>
+    </aside>
+    
+    <main class="content">
+      <section class="panel active" id="admindash">
+        <div class="panel-header">
+          <span>Monitoring Produksi</span>
+          <div style="display:flex;gap:.5rem;">
+            <!-- <button class="btn" id="btnRefreshDash">Refresh</button> -->
+          </div>
+        </div>
+        <div class="toolbar-card" style="margin: 0 0 1.5rem 0; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+            <div class="field">
+                <label>Line</label>
+                <select id="admDashLine">
+                    <option value="">Semua</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>Style</label>
+                <select id="admDashStyle">
+                    <option value="">Semua</option>
+                </select>
+            </div>
+        </div>
+        <div class="panel-summary" style="margin-bottom: 1.5rem;">
+          <div class="inline-summary">
+            <span class="badge" style="background: var(--success); color: white;">Output</span>
+            <span id="admSumOutput" class="badge value-inline" style="font-size: 1rem; padding: 4px 12px;">0</span>
+            <span class="badge" style="background: var(--danger); color: white;">Reject</span>
+            <span id="admSumReject" class="badge value-inline" style="font-size: 1rem; padding: 4px 12px;">0</span>
+            <span class="badge" style="background: var(--warning); color: white;">Repair</span>
+            <span id="admSumRepair" class="badge value-inline" style="font-size: 1rem; padding: 4px 12px;">0</span>
+          </div>
+        </div>
+        <table id="tableAdminDash"></table>
+      </section>
+
+      <section class="panel" id="users">
+        <div class="panel-header">
+          <span>Daftar User</span>
+          <div style="display:flex;gap:.5rem;">
+            <button class="btn btn-toggle" data-target="formUser">Tambah User</button>
+            <button class="btn btn-danger" id="btnDelUserSelect" style="display:none;">Hapus Terpilih</button>
+          </div>
+        </div>
+        <div class="toolbar-card" style="margin: 0 0 1rem 0; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+          <div class="field">
+            <label>Role</label>
+            <select id="filterUserRole">
+              <option value="">Semua</option>
+              <option value="superadmin">superadmin</option>
+              <option value="manager">manager</option>
+              <option value="admin">admin</option>
+              <option value="user">user</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Cari Nama</label>
+            <input type="text" id="searchUserName" placeholder="ketik username">
+          </div>
+        </div>
+        <form id="formUser" style="display:none;">
+          <h3 style="margin-bottom: 1rem;">Tambah / Edit User</h3>
+          <label>Username</label>
+          <input type="text" name="username" placeholder="username" required>
+          <label>Role</label>
+          <select name="role">
+            <option value="superadmin">superadmin</option>
+            <option value="manager">manager</option>
+            <option value="admin">admin</option>
+            <option value="user">user</option>
+          </select>
+          <label>Line</label>
+          <select name="line_id"><option value="">Pilih Line</option></select>
+          <label>Password (opsional)</label>
+          <input type="password" name="password" placeholder="kosongkan jika tidak diubah">
+          <div class="form-actions">
+            <button class="btn" type="submit">Simpan</button>
+            <button type="button" class="btn btn-danger btn-cancel-popup" data-target="formUser">Batal</button>
+          </div>
+        </form>
+        <table id="tableUsers"></table>
+      </section>
+
+      <section class="panel" id="mesin">
+        <div class="panel-header">
+          <span>Daftar Mesin</span>
+          <div style="display:flex;gap:.5rem;">
+            <button class="btn btn-toggle" data-target="formMesin">Tambah Mesin</button>
+            <button class="btn btn-danger" id="btnDelMesinSelect" style="display:none;">Hapus Terpilih</button>
+          </div>
+        </div>
+        <div class="toolbar-card" style="margin: 0 0 1rem 0; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+          <div class="field">
+            <label>Kategori</label>
+            <select id="filterMesinKategori"><option value="">Semua</option></select>
+          </div>
+          <div class="field">
+            <label>Jenis</label>
+            <select id="filterMesinJenis"><option value="">Semua</option></select>
+          </div>
+          <div class="field">
+            <label>Cari No Seri</label>
+            <input type="text" id="searchMesinNoSeri" placeholder="ketik no seri">
+          </div>
+        </div>
+        <form id="formMesin" style="display: none;">
+          <h3 style="margin-bottom: 1 rem;">Tambah Mesin</h3>
+          <label>No Seri</label>
+          <input type="text" name="no_seri" placeholder="Contoh: SN-002" required>
+          <label>Kategori</label>
+          <select name="kategori">
+            <option value="">-- Pilih Kategori --</option>
+            <option value="Single Needle">Single Needle</option>
+            <option value="Double Needle">Double Needle</option>
+            <option value="Overlock">Overlock</option>
+            <option value="Overdeck">Overdeck</option>
+            <option value="Bartack">Bartack</option>
+            <option value="Button Hole">Button Hole</option>
+            <option value="Button Attach">Button Attach</option>
+            <option value="Embroidery">Embroidery</option>
+            <option value="Cutting">Cutting</option>
+            <option value="Pressing">Pressing</option>
+          </select>
+          <label>Jenis</label>
+          <select name="jenis">
+            <option value="">-- Pilih Jenis --</option>
+          </select>
+          <label>Merk</label>
+          <select name="merk">
+            <option value="">-- Pilih Merk --</option>
+            <option value="JUKI">JUKI</option>
+            <option value="BROTHER">BROTHER</option>
+            <option value="JACK">JACK</option>
+            <option value="TYPICAL">TYPICAL</option>
+            <option value="SIRUBA">SIRUBA</option>
+            <option value="PEGASUS">PEGASUS</option>
+            <option value="YAMATO">YAMATO</option>
+            <option value="ZOJE">ZOJE</option>
+            <option value="TAJIMA">TAJIMA</option>
+            <option value="BARUDAN">BARUDAN</option>
+            <option value="HAPPY">HAPPY</option>
+            <option value="RICOMA">RICOMA</option>
+            <option value="KM">KM</option>
+            <option value="EASTMAN">EASTMAN</option>
+            <option value="GERBER">GERBER</option>
+            <option value="LECTRA">LECTRA</option>
+            <option value="DAYANG">DAYANG</option>
+            <option value="SILTER">SILTER</option>
+            <option value="HASHIMA">HASHIMA</option>
+            <option value="VEIT">VEIT</option>
+            <option value="ROTONDI">ROTONDI</option>
+            <option value="SILVER STAR">SILVER STAR</option>
+          </select>
+          <div class="form-actions">
+            <button class="btn" type="submit">Simpan</button>
+            <button type="button" class="btn btn-danger btn-cancel-popup" data-target="formMesin">Batal</button>
+          </div>
+        </form>
+        <table id="tableMesin"></table>
+      </section>
+
+      <section class="panel" id="line">
+        <div class="panel-header">
+          <span>Daftar Line</span>
+          <div style="display:flex;gap:.5rem;">
+            <button class="btn btn-toggle" data-target="formLine">Tambah Line</button>
+            <button class="btn btn-danger" id="btnDelLineSelect" style="display:none;">Hapus Terpilih</button>
+          </div>
+        </div>
+        <form id="formLine" style="display: none;">
+          <h3 style="margin-bottom: 1rem;">Tambah Line</h3>
+          <label>Nama Line</label>
+          <input type="text" name="nama_line" placeholder="Contoh: Line 1" required>
+          <div class="form-actions">
+            <button class="btn" type="submit">Simpan</button>
+            <button type="button" class="btn btn-danger btn-cancel-popup" data-target="formLine">Batal</button>
+          </div>
+        </form>
+        <table id="tableLine"></table>
+      </section>
+
+      <section class="panel" id="style">
+        <div class="panel-header">
+          <span>Master Style</span>
+          <div style="display:flex;gap:.5rem;">
+            <button class="btn btn-toggle" data-target="formStyle">Tambah Style</button>
+            <button class="btn btn-danger" id="btnDelStyleSelect" style="display:none;">Hapus Terpilih</button>
+          </div>
+        </div>
+        <form id="formStyle" style="display: none;">
+          <h3 style="margin-bottom: 1rem;">Tambah Style</h3>
+          <label>ORC</label>
+          <input type="text" name="orc" placeholder="ORC" required>
+          <label>PO</label>
+          <input type="text" name="po" placeholder="PO">
+          <label>Style</label>
+          <input type="text" name="style" placeholder="Style" required>
+          <label>Color</label>
+          <input type="text" name="color" placeholder="Color">
+          <label>Quantity</label>
+          <input type="number" name="quantity" placeholder="Quantity">
+          <label>Shipment Date</label>
+          <input type="date" name="shipmentdate" placeholder="Shipment Date">
+          <label>Deskripsi Orderan</label>
+          <input type="text" name="deskripsi_orderan" placeholder="Deskripsi Orderan">
+          <div class="form-actions">
+            <button class="btn" type="submit">Simpan</button>
+            <button type="button" class="btn btn-danger btn-cancel-popup" data-target="formStyle">Batal</button>
+          </div>
+        </form>
+        <table id="tableStyle"></table>
+      </section>
+
+      <section class="panel" id="proses">
+        <div class="panel-header">
+          <span>Process Breakdown</span>
+          <div style="display:flex;gap:.5rem;">
+            <button class="btn btn-toggle" data-target="formProses">Tambah Proses</button>
+            <button class="btn btn-danger" id="btnDelProsesSelect" style="display:none;">Hapus Terpilih</button>
+          </div>
+        </div>
+        <div class="toolbar-card" style="margin: 0 0 1.5rem 0;">
+          <div class="field">
+            <label>ORC</label>
+            <select id="prosesStyleSelect">
+                <option value="">Pilih ORC</option>
+            </select>
+            <div id="prosesStyleDisplay" style="margin-top: 0.5rem; font-weight: bold;"></div>
+          </div>
+        </div>
+        <form id="formProses" style="display: none;">
+          <h3 style="margin-bottom: 1rem;">Tambah Proses</h3>
+          <label>Urutan</label>
+          <input type="number" name="urutan" placeholder="Contoh: 1" required>
+          <label>Nama Proses</label>
+          <input type="text" name="nama_proses" placeholder="Contoh: Pasang Kerah" required>
+          <label>Tipe</label>
+          <select name="independent">
+            <option value="1">Independent</option>
+            <option value="0">Dependent</option>
+          </select>
+          <label>Next Proses</label>
+          <select name="next_proses_id">
+            <option value="">Tidak ada</option>
+          </select>
+          <div class="form-actions">
+            <button class="btn" type="submit">Simpan</button>
+            <button type="button" class="btn btn-danger btn-cancel-popup" data-target="formProses">Batal</button>
+          </div>
+        </form>
+        <table id="tableProses"></table>
+      </section>
+
+      <section class="panel" id="devices">
+        <div class="panel-header">
+          <span>Device Management</span>
+          <div style="display:flex;gap:.5rem;">
+            <button class="btn btn-toggle" data-target="formDevice">Tambah Device</button>
+            <button class="btn btn-danger" id="btnDelDeviceSelect" style="display:none;">Hapus Terpilih</button>
+          </div>
+        </div>
+        <form id="formDevice" style="display:none;">
+          <h3 style="margin-bottom: 1rem;">Tambah Device</h3>
+          <label>Nama</label>
+          <input type="text" name="nama" placeholder="Contoh: TX-01" required>
+          <label>Tipe</label>
+          <select name="tipe">
+            <option value="transmitter">transmitter</option>
+            <option value="receiver">receiver</option>
+          </select>
+          <label>Status</label>
+          <select name="status">
+            <option value="aktif">aktif</option>
+            <option value="digunakan">digunakan</option>
+          </select>
+          <div class="form-actions">
+            <button class="btn" type="submit">Simpan</button>
+            <button type="button" class="btn btn-danger btn-cancel-popup" data-target="formDevice">Batal</button>
+          </div>
+        </form>
+        <table id="tableDevice"></table>
+      </section>
+
+      <section class="panel" id="order">
+        <div class="panel-header">
+          <span>Operation Breakdown</span>
+        </div>
+        
+        <div class="tabs" style="display:flex; gap:1rem; margin-bottom:1.5rem; border-bottom:1px solid #ddd;">
+          <button class="tab-btn active" data-tab="op-breakdown" style="padding:0.5rem 1rem; border:none; background:none; cursor:pointer; border-bottom: 2px solid var(--primary); font-weight:bold;">Operation Breakdown</button>
+          <button class="tab-btn" data-tab="device-assign" style="padding:0.5rem 1rem; border:none; background:none; cursor:pointer;">Device Assignment</button>
+          <button class="tab-btn" data-tab="summary" style="padding:0.5rem 1rem; border:none; background:none; cursor:pointer;">Summary</button>
+        </div>
+
+        <!-- Tab 1: Operation Breakdown -->
+        <div id="tab-op-breakdown" class="tab-content active">
+          <form id="formOrderPlan" style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
+             <div class="field" style="grid-column: span 2;">
+                <h3 style="margin:0;">Rencanakan Operasi</h3>
+             </div>
+             <div class="field">
+                <label>Urutan</label>
+                <input type="number" name="urutan" placeholder="Urutan" required>
+             </div>
+             <div class="field">
+                <label>ORC</label>
+                <select name="orc" id="planOrcSelect"><option value="">Pilih ORC</option></select>
+             </div>
+             <div class="field">
+                <label>Line</label>
+                <select name="line_id" id="planLineSelect"><option value="">Pilih Line</option></select>
+             </div>
+             <div class="field">
+                <label>Proses</label>
+                <select name="proses_id" id="planProsesSelect"><option value="">Pilih Proses</option></select>
+             </div>
+             <div class="field">
+                <label>Kategori Mesin</label>
+                <select name="kategori_mesin" id="planKategoriSelect"><option value="">Pilih Kategori</option></select>
+             </div>
+             <div class="field">
+                <label>Jenis Mesin</label>
+                <select name="jenis_mesin" id="planJenisSelect"><option value="">Pilih Jenis</option></select>
+             </div>
+             <div class="field">
+                <label>Jumlah</label>
+                <input type="number" name="jumlah" min="1" value="1" required>
+             </div>
+             <div class="field" style="grid-column: span 2; display:flex; justify-content:flex-end;">
+                <button class="btn" type="submit">Lanjut ke Device Assignment</button>
+             </div>
+          </form>
+        </div>
+
+        <!-- Tab 2: Device Assignment -->
+        <div id="tab-device-assign" class="tab-content" style="display:none;">
+          <div id="deviceAssignList" style="margin-bottom: 1.5rem; display:grid; gap:1rem;"></div>
+          <div class="form-actions">
+              <button class="btn" id="btnSaveAssignments">Simpan Semua</button>
+          </div>
+        </div>
+
+        <!-- Tab 3: Summary -->
+        <div id="tab-summary" class="tab-content" style="display:none;">
+            <div class="panel-header" style="margin-bottom:1rem;">
+                <span>Daftar Order Aktif</span>
+                <button class="btn btn-danger" id="btnDelOrderSelect" style="display:none;">Hapus Terpilih</button>
+            </div>
+            <table id="tableOrder"></table>
+        </div>
+      </section>
+
+      <section class="panel" id="summary">
+        <div class="panel-header">
+          <span>Laporan Produksi</span>
+          <button class="btn" id="btnDownloadSummary" style="background: var(--success);">exc</button>
+        </div>
+        <div class="toolbar-card" style="margin-bottom: 1rem;">
+          <div class="field">
+            <label>Dari Tanggal</label>
+            <input type="date" id="filterSumStart">
+          </div>
+          <div class="field">
+            <label>Sampai Tanggal</label>
+            <input type="date" id="filterSumEnd">
+          </div>
+          <div class="field">
+            <label>Line</label>
+            <select id="filterSumLine"><option value="">Semua</option></select>
+          </div>
+          <div class="field">
+            <label>Style</label>
+            <select id="filterSumStyle"><option value="">Semua</option></select>
+            <div style="margin-top: .75rem;">
+              <button class="btn" id="btnRefreshSummary">Tampilkan</button>
+            </div>
+          </div>
+        </div>
+        <table id="tableSummary"></table>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      function switchPanel() {
+        var id = (location.hash || '#admindash').slice(1)
+        var panels = document.querySelectorAll('.panel')
+        var found = false
+        panels.forEach(function (p) {
+          var on = p.id === id
+          if (on) found = true
+          p.classList.toggle('active', on)
+          p.style.display = on ? 'block' : 'none'
+        })
+        if (!found) {
+          var def = document.getElementById('admindash')
+          if (def) { def.classList.add('active'); def.style.display = 'block' }
+          id = 'admindash'
+        }
+
+        var links = document.querySelectorAll('.sidebar a')
+        links.forEach(function (l) {
+          var href = l.getAttribute('href') || ''
+          var target = href.indexOf('#') === 0 ? href.slice(1) : ''
+          l.classList.toggle('active', target === id)
+        })
+
+        try {
+          if (id === 'admindash' && window.loadAdminDash) window.loadAdminDash()
+          if (id === 'users' && window.loadUsers) window.loadUsers()
+          if (id === 'line' && window.loadLine) window.loadLine()
+          if (id === 'mesin' && window.loadMesin) window.loadMesin()
+          if (id === 'devices' && window.loadDevice) window.loadDevice()
+          if (id === 'style' && window.loadStyle) window.loadStyle()
+          if (id === 'proses' && window.loadProses) window.loadProses()
+          if (id === 'order' && window.loadOrder) window.loadOrder()
+          if (id === 'summary' && window.loadProductionSummary) window.loadProductionSummary()
+        } catch (e) { /* noop */ }
+      }
+
+      window.addEventListener('hashchange', switchPanel)
+      document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.sidebar a[href^="#"]').forEach(function (a) {
+          a.addEventListener('click', function (e) {
+            e.preventDefault()
+            var h = a.getAttribute('href')
+            if (h) {
+              location.hash = h
+              switchPanel()
+            }
+          })
+        })
+        switchPanel()
+        
+        // Inline Clock Logic
+        const clockEl = document.getElementById('adminClock');
+        if (clockEl) {
+            function tick() {
+                clockEl.textContent = new Date().toLocaleString('id-ID');
+            }
+            tick();
+            setInterval(tick, 1000);
+        }
+      })
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+    <script defer src="/admin.js?v=33"></script>
+</head>
+<body>
+    <header style="position: relative; justify-content: space-between;">
+        <h1>Realtime Line Output Monitoring</h1>
+        <div id="adminClock" class="datetime" style="position: absolute; left: 50%; transform: translateX(-50%); white-space: nowrap;"></div>
+        <nav></nav>
+    </header>
+
+    <div class="layout">
+        <aside class="sidebar">
+            <h2>Menu</h2>
+            <ul>
+                <li id="nav-admindash"><a href="#admindash" class="active">Monitoring Produksi</a></li>
+                <li id="nav-summary"><a href="#summary">Laporan Produksi</a></li>
+                <li id="nav-logout"><a href="#" id="btnLogout">Logout</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <section class="panel active" id="admindash">
+                <div class="panel-header">
+                    <span>Realtime Line Output Monitoring</span>
+                </div>
+                
+                <div class="toolbar-card" style="margin: 0 0 1.5rem 0; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+                    <div class="field">
+                        <label>Line</label>
+                        <select id="admDashLine">
+                            <option value="">Semua</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Style</label>
+                        <select id="admDashStyle">
+                            <option value="">Semua</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="panel-summary" style="margin-bottom: 1.5rem;">
+                    <div class="inline-summary">
+                        <span class="badge" style="background: var(--success); color: white;">Output</span>
+                        <span id="admSumOutput" class="badge value-inline" style="font-size: 1rem; padding: 4px 12px;">0</span>
+                        <span class="badge" style="background: var(--danger); color: white;">Reject</span>
+                        <span id="admSumReject" class="badge value-inline" style="font-size: 1rem; padding: 4px 12px;">0</span>
+                        <span class="badge" style="background: var(--warning); color: white;">Repair</span>
+                        <span id="admSumRepair" class="badge value-inline" style="font-size: 1rem; padding: 4px 12px;">0</span>
+                    </div>
+                </div>
+
+                <table id="tableAdminDash"></table>
+            </section>
+
+            <section class="panel" id="summary">
+                <div class="panel-header">
+                    <span>Laporan Produksi</span>
+                </div>
+                <div class="toolbar-card" style="margin-bottom: 1rem;">
+                    <div class="field">
+                        <label>Dari Tanggal</label>
+                        <input type="date" id="filterSumStart">
+                    </div>
+                    <div class="field">
+                        <label>Sampai Tanggal</label>
+                        <input type="date" id="filterSumEnd">
+                    </div>
+                    <div class="field">
+                        <label>Line</label>
+                        <select id="filterSumLine"><option value="">Semua</option></select>
+                    </div>
+                    <div class="field">
+                        <label>Style</label>
+                        <select id="filterSumStyle"><option value="">Semua</option></select>
+                        <div style="margin-top: .75rem;">
+                            <button class="btn" id="btnRefreshSummary">Tampilkan</button>
+                        </div>
+                    </div>
+                </div>
+                <table id="tableSummary"></table>
+            </section>
+        </main>
+    </div>
+
+    <script>
+    (function(){
+      function switchPanel() {
+        var id = (location.hash || '#admindash').slice(1)
+        var panels = document.querySelectorAll('.panel')
+        var found = false
+        panels.forEach(function(p){
+          var on = p.id === id
+          if (on) found = true
+          p.classList.toggle('active', on)
+          p.style.display = on ? 'block' : 'none'
+        })
+        if (!found) {
+          var def = document.getElementById('admindash')
+          if (def) { def.classList.add('active'); def.style.display = 'block' }
+        }
+        var links = document.querySelectorAll('.sidebar a')
+        links.forEach(function(l){
+          var href = l.getAttribute('href') || ''
+          var target = href.indexOf('#') === 0 ? href.slice(1) : ''
+          l.classList.toggle('active', target === id)
+        })
+        try {
+          if (id === 'admindash' && window.loadAdminDash) window.loadAdminDash()
+          if (id === 'summary' && window.loadProductionSummary) window.loadProductionSummary()
+        } catch (e) { /* noop */ }
+      }
+      window.addEventListener('hashchange', switchPanel)
+      document.addEventListener('DOMContentLoaded', function(){
+        var btnLogout = document.getElementById('btnLogout')
+        if (btnLogout) {
+          btnLogout.addEventListener('click', function(e){
+            e.preventDefault()
+            fetch('/api/logout', { method: 'POST' })
+              .then(function(){ window.location.href = '/' })
+              .catch(function(){ window.location.href = '/' })
+          })
+        }
+        document.querySelectorAll('.sidebar a[href^="#"]').forEach(function(a){
+          a.addEventListener('click', function(e){
+            e.preventDefault()
+            var h = a.getAttribute('href')
+            if (h) {
+              location.hash = h
+              switchPanel()
+            }
+          })
+        })
+        switchPanel()
+        
+        // Inline Clock Logic
+        const clockEl = document.getElementById('adminClock');
+        if (clockEl) {
+            function tick() {
+                clockEl.textContent = new Date().toLocaleString('id-ID');
+            }
+            tick();
+            setInterval(tick, 1000);
+        }
+      })
+    })();
+    </script>
+</body>
+</html>

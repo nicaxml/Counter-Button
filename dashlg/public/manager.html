@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Realtime Line Output Monitoring — Manager</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <script defer src="/admin.js?v=33"></script>
+</head>
+<body>
+  <header style="position: relative; justify-content: space-between;">
+    <h1>Realtime Line Output Monitoring</h1>
+    <div id="adminClock" class="datetime" style="position: absolute; left: 50%; transform: translateX(-50%); white-space: nowrap;"></div>
+    <nav>
+      <button id="logoutBtn" class="navlink" title="Logout" style="display:inline-flex;align-items:center;gap:.25rem;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <path d="M16 17l5-5-5-5"/>
+          <path d="M21 12H9"/>
+        </svg>
+      </button>
+    </nav>
+  </header>
+  
+  <main class="content" style="padding: 1rem;">
+    <section class="panel active" id="admindash">
+      <div class="panel-header">
+        <span>Monitoring Produksi</span>
+      </div>
+      <div class="toolbar-card" style="margin: 0 0 1.5rem 0; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+        <div class="field">
+          <label>Line</label>
+          <select id="admDashLine">
+            <option value="">Semua</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Style</label>
+          <select id="admDashStyle">
+            <option value="">Semua</option>
+          </select>
+        </div>
+      </div>
+      <div class="panel-summary" style="margin-bottom: 1.5rem;">
+        <div class="inline-summary">
+          <span class="badge" style="background: var(--success); color: white;">Output</span>
+          <span id="admSumOutput" class="badge value-inline" style="font-size: 1rem; padding: 4px 12px;">0</span>
+          <span class="badge" style="background: var(--danger); color: white;">Reject</span>
+          <span id="admSumReject" class="badge value-inline" style="font-size: 1rem; padding: 4px 12px;">0</span>
+          <span class="badge" style="background: var(--warning); color: white;">Repair</span>
+          <span id="admSumRepair" class="badge value-inline" style="font-size: 1rem; padding: 4px 12px;">0</span>
+        </div>
+      </div>
+      <table id="tableAdminDash"></table>
+    </section>
+    <section class="panel" id="summary" style="margin-top:2rem;">
+      <div class="panel-header">
+        <span>Laporan Produksi</span>
+      </div>
+      <div class="toolbar-card" style="margin-bottom: 1rem;">
+        <div class="field">
+          <label>Dari Tanggal</label>
+          <input type="date" id="filterSumStart">
+        </div>
+        <div class="field">
+          <label>Sampai Tanggal</label>
+          <input type="date" id="filterSumEnd">
+        </div>
+        <div class="field">
+          <label>Line</label>
+          <select id="filterSumLine"><option value="">Semua</option></select>
+        </div>
+        <div class="field">
+          <label>Style</label>
+          <select id="filterSumStyle"><option value="">Semua</option></select>
+          <div style="margin-top: .75rem;">
+            <button class="btn" id="btnRefreshSummary">Tampilkan</button>
+          </div>
+        </div>
+      </div>
+      <table id="tableSummary"></table>
+    </section>
+  </main>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (window.loadAll) window.loadAll();
+      
+      // Realtime Clock fallback
+      const clockEl = document.getElementById('adminClock');
+      if (clockEl) {
+        function tick() {
+          clockEl.textContent = new Date().toLocaleString('id-ID');
+        }
+        tick();
+        setInterval(tick, 1000);
+      }
+    });
+  </script>
+</body>
+</html>

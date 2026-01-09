@@ -1,0 +1,22 @@
+{
+  "name": "dashlg",
+  "version": "1.0.0",
+  "description": "Realtime Line Output Monitoring",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "express": "^5.2.1",
+    "express-session": "^1.17.3",
+    "dotenv": "^16.3.1",
+    "mysql2": "^3.11.3",
+    "node-cron": "^4.2.1",
+    "mqtt": "^4.3.7",
+    "socket.io": "^4.8.3"
+  }
+}
