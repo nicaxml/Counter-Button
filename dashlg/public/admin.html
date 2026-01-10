@@ -20,6 +20,9 @@
             <h2>Menu</h2>
             <ul>
                 <li id="nav-admindash"><a href="#admindash" class="active">Monitoring Produksi</a></li>
+                <li id="nav-style"><a href="#style">Master Style</a></li>
+                <li id="nav-proses"><a href="#proses">Process Breakdown</a></li>
+                <li id="nav-order"><a href="#order">Operation Breakdown</a></li>
                 <li id="nav-summary"><a href="#summary">Laporan Produksi</a></li>
                 <li id="nav-logout"><a href="#" id="btnLogout">Logout</a></li>
             </ul>
@@ -28,7 +31,7 @@
         <main class="content">
             <section class="panel active" id="admindash">
                 <div class="panel-header">
-                    <span>Realtime Line Output Monitoring</span>
+                    <span>Monitoring Produksi</span>
                 </div>
                 
                 <div class="toolbar-card" style="margin: 0 0 1.5rem 0; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
@@ -58,6 +61,144 @@
                 </div>
 
                 <table id="tableAdminDash"></table>
+            </section>
+
+            <section class="panel" id="style">
+                <div class="panel-header">
+                    <span>Master Style</span>
+                    <div style="display:flex;gap:.5rem;">
+                        <button class="btn btn-toggle" data-target="formStyle">Tambah Style</button>
+                        <button class="btn btn-danger" id="btnDelStyleSelect" style="display:none;">Hapus Terpilih</button>
+                    </div>
+                </div>
+                <form id="formStyle" style="display: none;">
+                    <h3 style="margin-bottom: 1rem;">Tambah Style</h3>
+                    <label>ORC</label>
+                    <input type="text" name="orc" placeholder="ORC" required>
+                    <label>PO</label>
+                    <input type="text" name="po" placeholder="PO">
+                    <label>Style</label>
+                    <input type="text" name="style" placeholder="Style" required>
+                    <label>Color</label>
+                    <input type="text" name="color" placeholder="Color">
+                    <label>Quantity</label>
+                    <input type="number" name="quantity" placeholder="Quantity">
+                    <label>Shipment Date</label>
+                    <input type="date" name="shipmentdate" placeholder="Shipment Date">
+                    <label>Deskripsi Orderan</label>
+                    <input type="text" name="deskripsi_orderan" placeholder="Deskripsi Orderan">
+                    <div class="form-actions">
+                        <button class="btn" type="submit">Simpan</button>
+                        <button type="button" class="btn btn-danger btn-cancel-popup" data-target="formStyle">Batal</button>
+                    </div>
+                </form>
+                <table id="tableStyle"></table>
+            </section>
+
+            <section class="panel" id="proses">
+                <div class="panel-header">
+                    <span>Process Breakdown</span>
+                    <div style="display:flex;gap:.5rem;">
+                        <button class="btn btn-toggle" data-target="formProses">Tambah Proses</button>
+                        <button class="btn btn-danger" id="btnDelProsesSelect" style="display:none;">Hapus Terpilih</button>
+                    </div>
+                </div>
+                <div class="toolbar-card" style="margin: 0 0 1.5rem 0;">
+                    <div class="field">
+                        <label>ORC</label>
+                        <select id="prosesStyleSelect">
+                            <option value="">Pilih ORC</option>
+                        </select>
+                        <div id="prosesStyleDisplay" style="margin-top: 0.5rem; font-weight: bold;"></div>
+                    </div>
+                </div>
+                <form id="formProses" style="display: none;">
+                    <h3 style="margin-bottom: 1rem;">Tambah Proses</h3>
+                    <label>Urutan</label>
+                    <input type="number" name="urutan" placeholder="Contoh: 1" required>
+                    <label>Nama Proses</label>
+                    <input type="text" name="nama_proses" placeholder="Contoh: Pasang Kerah" required>
+                    <label>Tipe</label>
+                    <select name="independent">
+                        <option value="1">Independent</option>
+                        <option value="0">Dependent</option>
+                    </select>
+                    <label>Next Proses</label>
+                    <select name="next_proses_id">
+                        <option value="">Tidak ada</option>
+                    </select>
+                    <div class="form-actions">
+                        <button class="btn" type="submit">Simpan</button>
+                        <button type="button" class="btn btn-danger btn-cancel-popup" data-target="formProses">Batal</button>
+                    </div>
+                </form>
+                <table id="tableProses"></table>
+            </section>
+
+            <section class="panel" id="order">
+                <div class="panel-header">
+                    <span>Operation Breakdown</span>
+                </div>
+
+                <div class="tabs" style="display:flex; gap:1rem; margin-bottom:1.5rem; border-bottom:1px solid #ddd;">
+                    <button class="tab-btn active" data-tab="op-breakdown" style="padding:0.5rem 1rem; border:none; background:none; cursor:pointer; border-bottom: 2px solid var(--primary); font-weight:bold;">Operation Breakdown</button>
+                    <button class="tab-btn" data-tab="device-assign" style="padding:0.5rem 1rem; border:none; background:none; cursor:pointer;">Device Assignment</button>
+                    <button class="tab-btn" data-tab="summary" style="padding:0.5rem 1rem; border:none; background:none; cursor:pointer;">Summary</button>
+                </div>
+
+                <div id="tab-op-breakdown" class="tab-content active">
+                    <form id="formOrderPlan" style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
+                        <div class="field" style="grid-column: span 2;">
+                            <h3 style="margin:0;">Rencanakan Operasi</h3>
+                        </div>
+                        <div class="field">
+                            <label>Urutan</label>
+                            <input type="number" name="urutan" placeholder="Urutan" required>
+                        </div>
+                        <div class="field">
+                            <label>ORC</label>
+                            <select name="orc" id="planOrcSelect"><option value="">Pilih ORC</option></select>
+                        </div>
+                        <div class="field">
+                            <label>Line</label>
+                            <select name="line_id" id="planLineSelect"><option value="">Pilih Line</option></select>
+                        </div>
+                        <div class="field">
+                            <label>Proses</label>
+                            <select name="proses_id" id="planProsesSelect"><option value="">Pilih Proses</option></select>
+                        </div>
+                        <div class="field">
+                            <label>Kategori Mesin</label>
+                            <select name="kategori_mesin" id="planKategoriSelect"><option value="">Pilih Kategori</option></select>
+                        </div>
+                        <div class="field">
+                            <label>Jenis Mesin</label>
+                            <select name="jenis_mesin" id="planJenisSelect"><option value="">Pilih Jenis</option></select>
+                        </div>
+                        <div class="field">
+                            <label>Jumlah</label>
+                            <input type="number" name="jumlah" min="1" value="1" required>
+                        </div>
+                        <div class="field" style="grid-column: span 2; display:flex; justify-content:flex-end;">
+                            <button class="btn" type="submit">Lanjut ke Device Assignment</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="tab-device-assign" class="tab-content" style="display:none;">
+                    <div id="deviceAssignList" style="margin-bottom: 1.5rem; display:grid; gap:1rem;"></div>
+                    <div class="form-actions">
+                        <button class="btn" id="btnSaveAssignments">Simpan Semua</button>
+                    </div>
+                </div>
+
+                <div id="tab-summary" class="tab-content" style="display:none;">
+                    <div class="panel-header" style="margin-bottom:1rem;">
+                        <span>Daftar Order Aktif</span>
+                        <button class="btn btn-danger" id="btnDelOrderSelect" style="display:none;">Hapus Terpilih</button>
+                    </div>
+                    <table id="tableOrder"></table>
+                </div>
             </section>
 
             <section class="panel" id="summary">
@@ -105,6 +246,7 @@
         if (!found) {
           var def = document.getElementById('admindash')
           if (def) { def.classList.add('active'); def.style.display = 'block' }
+          id = 'admindash'
         }
         var links = document.querySelectorAll('.sidebar a')
         links.forEach(function(l){
@@ -114,6 +256,9 @@
         })
         try {
           if (id === 'admindash' && window.loadAdminDash) window.loadAdminDash()
+          if (id === 'style' && window.loadStyle) window.loadStyle()
+          if (id === 'proses' && window.loadProses) window.loadProses()
+          if (id === 'order' && window.loadOrder) window.loadOrder()
           if (id === 'summary' && window.loadProductionSummary) window.loadProductionSummary()
         } catch (e) { /* noop */ }
       }
