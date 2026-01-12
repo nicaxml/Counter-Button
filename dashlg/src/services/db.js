@@ -5,9 +5,11 @@ const path = require('path')
 
 const pool = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
-  port: parseInt(process.env.DB_PORT || '3306', 10),
+  // port: parseInt(process.env.DB_PORT || '3306', 10),
+  port: parseInt(process.env.DB_PORT || '3307', 10),
   user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
+  // password: process.env.DB_PASSWORD || '',
+  password: process.env.DB_PASSWORD || 'G0dBl3sY0u',
   database: process.env.DB_NAME || 'dashlg_db',
   waitForConnections: true,
   connectionLimit: 10,
@@ -19,9 +21,11 @@ async function initDb() {
   try {
     const connection = await mysql.createConnection({
       host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT || '3306', 10),
+      // port: parseInt(process.env.DB_PORT || '3306', 10),
+      port: parseInt(process.env.DB_PORT || '3307', 10),
       user: process.env.DB_USER || 'root',
-      password: process.env.DB_PASSWORD || ''
+      // password: process.env.DB_PASSWORD || ''
+      password: process.env.DB_PASSWORD || 'G0dBl3sY0u'
     })
     
     await connection.query(`CREATE DATABASE IF NOT EXISTS \`${process.env.DB_NAME || 'dashlg_db'}\`;`)
