@@ -1056,7 +1056,7 @@ async function createStore(io) {
         COALESCE(SUM(CASE WHEN pl.type = 'accept' THEN pl.count ELSE 0 END), 0) as accept,
         COALESCE(SUM(CASE WHEN pl.type = 'reject' THEN pl.count ELSE 0 END), 0) as reject,
         COALESCE(SUM(CASE WHEN pl.type = 'repair' THEN pl.count ELSE 0 END), 0) as repair,
-        COALESCE(SUM(CASE WHEN pl.type = 'output_garment' OR pl.type = 'accept' THEN pl.count ELSE 0 END), 0) as output_garment,
+        COALESCE(SUM(CASE WHEN pl.type = 'output' THEN pl.count ELSE 0 END), 0) as output_garment,
         MAX(s.quantity) as order_qty
       FROM devices d
       LEFT JOIN counters c ON d.id = c.transmitter_id AND c.active = 1
@@ -1076,7 +1076,7 @@ async function createStore(io) {
         COALESCE(SUM(CASE WHEN pl.type = 'accept' THEN pl.count ELSE 0 END), 0) as accept,
         COALESCE(SUM(CASE WHEN pl.type = 'reject' THEN pl.count ELSE 0 END), 0) as reject,
         COALESCE(SUM(CASE WHEN pl.type = 'repair' THEN pl.count ELSE 0 END), 0) as repair,
-        COALESCE(SUM(CASE WHEN pl.type = 'output_garment' OR pl.type = 'accept' THEN pl.count ELSE 0 END), 0) as output_garment,
+        COALESCE(SUM(CASE WHEN pl.type = 'output' THEN pl.count ELSE 0 END), 0) as output_garment,
         MAX(s.quantity) as order_qty
       FROM devices d
       LEFT JOIN counters c ON d.id = c.transmitter_id AND c.active = 1

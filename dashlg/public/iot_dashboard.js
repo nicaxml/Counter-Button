@@ -190,6 +190,7 @@ async function loadData() {
     if (currentStyleId) qs.set('style_id', String(currentStyleId))
     const res = await fetch('/api/iot/stats' + (qs.toString() ? `?${qs.toString()}` : ''))
     const data = await res.json()
+    // console.log(data);
 
     // Update Summary Grid
     if (data.txStats) {

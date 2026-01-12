@@ -125,6 +125,7 @@ router.get('/stats', async (req, res) => {
   const line_id = req.query.line_id ? parseInt(req.query.line_id, 10) : null
   const style_id = req.query.style_id ? parseInt(req.query.style_id, 10) : null
   const stats = await storeRef.getIoTStats({ line_id, style_id })
+  // console.log('IoT Stats Request:', { line_id, style_id }, stats);
   res.json(stats)
 })
 
